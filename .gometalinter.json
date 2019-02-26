@@ -2,6 +2,7 @@
   "Fast": true,
   "Cyclo": 15,
   "Disable": [
-    "gotype"
+    "gotype",
+    "gosec"
   ]
 }

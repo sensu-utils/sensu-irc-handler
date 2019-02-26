@@ -85,6 +85,6 @@ func main() {
 			log.Println("Sent message")
 		}
 	case <-time.After(10 * time.Second):
-		log.Println("Message timeout")
+		log.Fatalln("Message timeout")
 	}
 }
