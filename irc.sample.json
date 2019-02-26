@@ -1,0 +1,6 @@
+{
+  "irc_nick": "sensu",
+  "irc_server": "chat.freenode.net:6667",
+  "irc_ssl": true,
+  "irc_channel": "#blackhole"
+}
