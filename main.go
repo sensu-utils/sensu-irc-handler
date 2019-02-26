@@ -7,8 +7,8 @@ import (
 	"os"
 	"time"
 
-	utils "github.com/belak/sensu-go-utils"
 	"github.com/go-irc/irc"
+	"github.com/sensu-utils/toolbox"
 )
 
 // Config represents the expected config.
@@ -21,10 +21,10 @@ type Config struct {
 }
 
 var config Config
-var event utils.Event
+var event toolbox.Event
 
 func main() {
-	utils.InitPlugin("irc", &event, &config)
+	toolbox.InitPlugin("irc", &event, &config)
 
 	errChan := make(chan error)
 
