@@ -3,7 +3,7 @@ go:
 - 1.12.x
 
 env:
-  - GO111MODULE=on
+- GO111MODULE=on
 
 before_install:
 - GO111MODULE=off go get github.com/alecthomas/gometalinter
@@ -18,15 +18,17 @@ script:
 - go test -race -v ./...
 
 deploy:
-- #goreleaser
-  provider: script
+- provider: script
   script: curl -sL https://git.io/goreleaser | bash
   skip_cleanup: true
   on:
     tags: true
-    condition: $TRAVIS_OS_NAME = linux
+    condition: "$TRAVIS_OS_NAME = linux"
 
 after_deploy:
 - git clone https://github.com/sensu/sensu-go-bonsai-asset.git bonsai
 - bonsai/generate-sha512sum.sh
-- bonsai/github-release-upload.sh github_api_token=$GITHUB_TOKEN repo_slug="$TRAVIS_REPO_SLUG" tag="${TRAVIS_TAG}" filename="dist/$(cat dist/sha512_file)"
+- bonsai/github-release-upload.sh github_api_token=$GITHUB_TOKEN repo_slug="$TRAVIS_REPO_SLUG"
+  tag="${TRAVIS_TAG}" filename="dist/$(cat dist/sha512_file)"
+
+secure: KMy6iZJ48qqBoKr6Yuvw0+geCDafz5F7hi2yXm0UzHA+ryfvUBq25Lo6OiMOFk/P9l5nGzmDUlHnlaxzP6SOdXcxtPWWqYv/ZbrcsJbq5SAD3zTnqBeEzbYmeTi5GAO6Fyyd4CFYTKfRwPCDyiDH9mKk28PdP9WPOm4y4hokNvdWFMkWlb2gKi2M91KCjb37eXPDvnC/1U5Ggp83l9GcvHRQp4PMpybCu3Mv6h6lTBtj6duNHqh9x8bQA/OsRhhYalbbv12c0EaoUJQkNJBwdnpMCsXjj2nu75To/LaJL+/FT7mvNwv7tzRfI+D9GXN6Bco1Jzn5yIAvAfAk9xEtElhxLcNlNnzvzjLsefXUbI0+qfqrHUO9bOAAcuhYW6Spc1tCduhiBacSr3A3UTieGSLckCcRsQ1nvEqz7S6WGlfTPIprUOLARCaklvGZgcnVvS7x4oV2Fn1QtGRWn2/FiOMfYozlpStYnf/abJiCZgVEO9G1w+bv5PhEV0L4v7t8CjG+YtadRC5+IUq+PpaCptp/wF6F9h4AuS20VGdpvtQl+GecIEHr2qbMWV3ORcUMCUDwiYWUAWJffJeGHq9KF9MK6h2oGrwGX0oGPlsNk+mR6n3GPy15wNp6rZVnIVLvWR6RCavV0fVFQqTd+mU8lTrW66SK6HoUlfsXZV6gycg=
