@@ -44,10 +44,19 @@ func main() {
 
 		conn := irc.NewConn(rawConn)
 		if config.Password != "" {
-			conn.Writef("PASS :%s", config.Password)
+			if err := conn.Writef("PASS :%s", config.Password); err != nil {
+				log.Println("failed to send PASS to server")
+				return
+			}
 		}
-		conn.Writef("NICK :%s", config.Nick)
-		conn.Writef("USER %s 0.0.0.0 0.0.0.0 :%s", "sensu", "sensu")
+		if err := conn.Writef("NICK :%s", config.Nick); err != nil {
+			log.Println("failed to send NICK to server")
+			return
+		}
+		if err := conn.Writef("USER %s 0.0.0.0 0.0.0.0 :%s", "sensu", "sensu"); err != nil {
+			log.Println("failed to set IRC user to server")
+			return
+		}
 
 		var actionString = "\x0301,04ALERT\x03"
 		if event.IsResolution() {
@@ -64,11 +73,23 @@ func main() {
 			if msg.Command == "PING" {
 				reply := msg.Copy()
 				reply.Command = "PONG"
-				conn.WriteMessage(reply)
+				if err := conn.WriteMessage(reply); err != nil {
+					log.Println("failed reply to server PING")
+					return
+				}
 			} else if msg.Command == "001" {
-				conn.Writef("JOIN :%s", config.Channel)
-				conn.Writef("PRIVMSG %s :%s %s/%s: %s", config.Channel, actionString, event.Entity.System.Hostname, event.Check.Name, event.Check.Output)
-				conn.Writef("QUIT :bye")
+				if err := conn.Writef("JOIN :%s", config.Channel); err != nil {
+					log.Printf("failed JOIN IRC Room: %s", config.Channel)
+					return
+				}
+				if err := conn.Writef("PRIVMSG %s :%s %s/%s: %s", config.Channel, actionString, event.Entity.System.Hostname, event.Check.Name, event.Check.Output); err != nil {
+					log.Printf("failed message IRC Room %s with message: %s %s/%s: %s", config.Channel, actionString, event.Entity.System.Hostname, event.Check.Name, event.Check.Output)
+					return
+				}
+				if err := conn.Writef("QUIT :bye"); err != nil {
+					log.Println("failed to quit IRC server")
+					return
+				}
 
 				errChan <- nil
 				return
