@@ -11,6 +11,7 @@ import (
 	"github.com/go-irc/irc"
 )
 
+// Config represents the expected config.
 type Config struct {
 	Nick     string `json:"irc_nick"`
 	Server   string `json:"irc_server"`

@@ -1,0 +1,36 @@
+language: go
+go:
+- 1.12.x
+
+before_install:
+- go get github.com/axw/gocov/gocov
+- go get github.com/mattn/goveralls
+- go get golang.org/x/tools/cmd/cover
+# Grab all deps (should just be test deps)
+- go get -v -t ./...
+# Linting deps
+- go get github.com/alecthomas/gometalinter
+- gometalinter --install
+- go mod download
+
+before_script:
+- echo "REPO $TRAVIS_REPO_SLUG TAG ${TRAVIS_TAG}"
+
+script:
+- gometalinter ./...
+- go test -race -v ./...
+- go test -covermode=count -coverprofile=profile.cov
+
+deploy:
+- #goreleaser
+  provider: script
+  script: curl -sL https://git.io/goreleaser | bash
+  skip_cleanup: true
+  on:
+    tags: true
+    condition: $TRAVIS_OS_NAME = linux
+
+after_deploy:
+- git clone https://github.com/sensu/sensu-go-bonsai-asset.git bonsai
+- bonsai/generate-sha512sum.sh
+- bonsai/github-release-upload.sh github_api_token=$GITHUB_TOKEN repo_slug="$TRAVIS_REPO_SLUG" tag="${TRAVIS_TAG}" filename="dist/$(cat dist/sha512_file)"
